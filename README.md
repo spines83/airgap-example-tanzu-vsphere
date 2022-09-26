@@ -152,20 +152,22 @@ If you wanted to omit helm, you'd need to build & configure a good bit of this m
 $ helm template mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
-    --set image.registry=harbor.tanzu.home
+    --set image.registry=harbor.tanzu.home \
+    --set primary.persistence.size=100Gi
 ```
 
 ### Deploy the helm package
 
 Docs for the MySQL Helm chart: https://github.com/bitnami/charts/tree/master/bitnami/mysql/#installing-the-chart
 
-Will need to provide configuration to point to the new registry (instead of the default public internet one)
+Will need to provide configuration to point to the new registry (instead of the default public internet one). I also included a configuration to bump up the default database size from 8GiB > 100 GiB
 
 ```
 $ helm install mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
-    --set image.registry=harbor.tanzu.home
+    --set image.registry=harbor.h2o-2-1111.h2o.vmware.com \
+    --set primary.persistence.size=100Gi
 ```
 
 ### Verify installation details
@@ -182,7 +184,7 @@ NAME                     READY   AGE
 statefulset.apps/mysql   1/1     10m
 
 NAME                                 STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS         AGE
-persistentvolumeclaim/data-mysql-0   Bound    pvc-a6902705-a0dc-4932-b659-d28193bb5aa8   8Gi        RWO            vc01cl01-t0compute   10m
+persistentvolumeclaim/data-mysql-0   Bound    pvc-a6902705-a0dc-4932-b659-d28193bb5aa8   100Gi        RWO            vc01cl01-t0compute   10m
 ```
 
 ### Uninstalling
