@@ -11,9 +11,10 @@
   - [Target network (deploy)](#target-network-deploy)
     - [Load the docker contianer locally](#load-the-docker-contianer-locally)
     - [Re-tag and push the container to the destination network's container registry](#re-tag-and-push-the-container-to-the-destination-networks-container-registry)
-  - [Deploy the helm package](#deploy-the-helm-package)
-  - [Verify installation details](#verify-installation-details)
-  - [Uninstalling](#uninstalling)
+    - [(Optional) Preview kubernetes resources to be deployed](#optional-preview-kubernetes-resources-to-be-deployed)
+    - [Deploy the helm package](#deploy-the-helm-package)
+    - [Verify installation details](#verify-installation-details)
+    - [Uninstalling](#uninstalling)
 - [Using kubectl](#using-kubectl)
 
 # Using kubectl + helm
@@ -136,13 +137,14 @@ docker tag docker.io/mysql:8 harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
 docker push harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
 ```
 
-## Deploy the helm package
+### (Optional) Preview kubernetes resources to be deployed
+
+This is definitely good to run and look at for educational purposes. When you run `helm install` on the next step, it's going to effectively save this output to a temporary file and run `kubectl apply -f` against it.
+
+If you wanted to omit helm, you'd need to build & configure a good bit of this manually. Bitnami does a pretty good job throwing togther "production-ready" helm charts. 
+
 ```
-# Docs: https://github.com/bitnami/charts/tree/master/bitnami/mysql/#installing-the-chart
-
-# Will need to provide configuration to point to the repository
-
-helm install mysql mysql-9.3.1.tgz \
+helm template mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
     --set image.registry=harbor.h2o-2-1111.h2o.vmware.com \
@@ -150,7 +152,22 @@ helm install mysql mysql-9.3.1.tgz \
     --set image.tag=8
 ```
 
-## Verify installation details
+### Deploy the helm package
+
+Docs for the MySQL Helm chart: https://github.com/bitnami/charts/tree/master/bitnami/mysql/#installing-the-chart
+
+Will need to provide configuration to point to the new registry (instead of the default public internet one)
+
+```
+helm template mysql mysql-9.3.1.tgz \
+    --namespace mysql \
+    --create-namespace \
+    --set image.registry=harbor.h2o-2-1111.h2o.vmware.com \
+    --set image.repository=airgap/mysql \
+    --set image.tag=8
+```
+
+### Verify installation details
 ```
 $ kubectl get pod,svc,statefulset,pvc -n mysql                  
 NAME          READY   STATUS    RESTARTS   AGE
@@ -167,7 +184,7 @@ NAME                                 STATUS   VOLUME                            
 persistentvolumeclaim/data-mysql-0   Bound    pvc-a6902705-a0dc-4932-b659-d28193bb5aa8   8Gi        RWO            vc01cl01-t0compute   10m
 ```
 
-## Uninstalling
+### Uninstalling
 ```
 $ helm uninstall mysql -n mysql
 release "mysql" uninstalled
