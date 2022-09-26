@@ -20,9 +20,12 @@
 
 Binaries needed:
 * docker
-* helm
+  * If Docker Desktop licensing is an issue, podman should work in place for most of the below.
 * kubectl
 * kubectl-vsphere (if on vSphere w/ Tanzu)
+* helm
+
+If you're using vSphere w/ Tanzu, `kubectl` and `kubectl-vsphere` can be downloaded from one of your SupervisorControlPlane nodes on port 443
 
 ## Source network (public internet)
 
