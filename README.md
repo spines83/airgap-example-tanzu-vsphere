@@ -92,7 +92,11 @@ Disclaimer: The secure way to do this is to grab the CA from your container regi
 
 ### Deploy needed role-based access control (RBAC) resources
 
-This example below just deploys a global "anyone can run stuff privileged" policy. It should not be used on a production system. 
+This example below deploys a global "anyone can run privileged containers" policy.  
+
+While it is convienent for testing and evaluation, it should not be used on a production system. 
+
+The secure way to handle this would be to deploy a default restricted security policy across the board and let specific workloads opt-in to the privileged policy when they have a necessary justification to do so. 
 
 ```
 $ cat scripts/tkgs/default_privileged_sas.yaml 
