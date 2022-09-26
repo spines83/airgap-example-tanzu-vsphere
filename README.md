@@ -32,7 +32,6 @@ If you're using vSphere w/ Tanzu, `kubectl` and `kubectl-vsphere` can be downloa
 
 ### Download container as a tarball
 ```
-# syntax docker save <image> -o <filename>
 $ docker pull docker.io/mysql:8
 $ docker save docker.io/mysql:8 -o mysql_container.tgz
 ```
@@ -55,15 +54,15 @@ Run the following if needed
 
 ### Login to your target contianer registry
 ```
-$ docker login harbor.h2o-2-1111.h2o.vmware.com
+$ docker login harbor.tanzu.home
 ```
 
 ### Login to the kubernetes cluster
 ```
 $ kubectl vsphere login \
       --server=https://<worker-cluster-control-plane-endpoint>:6443 \
-      --insecure-skip-tls-verify \
-      --tanzu-kubernetes-cluster-name worker-cluster-name
+      --tanzu-kubernetes-cluster-name <worker-cluster-name> \
+      --insecure-skip-tls-verify
 ```
 
 ### Disable SSL verification from your local workstation to the container registry
@@ -81,7 +80,7 @@ $ cat ~/.docker/daemon.json
     "buildkit": false
   },
   "insecure-registries": [
-    "harbor.h2o-2-1111.h2o.vmware.com"    <<<< Add this
+    "harbor.tanzu.home"    <<<< Add this
   ]
 }
 ```
@@ -137,8 +136,8 @@ $ docker load -i mysql_container.tgz
 
 ### Re-tag and push the container to the destination network's container registry
 ```
-$ docker tag docker.io/mysql:8 harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
-$ docker push harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
+$ docker tag docker.io/mysql:8 harbor.tanzu.home/airgap/mysql:8
+$ docker push harbor.tanzu.home/airgap/mysql:8
 ```
 
 ### (Optional) Preview kubernetes resources to be deployed
@@ -151,7 +150,7 @@ If you wanted to omit helm, you'd need to build & configure a good bit of this m
 $ helm template mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
-    --set image.registry=harbor.h2o-2-1111.h2o.vmware.com \
+    --set image.registry=harbor.tanzu.home \
     --set image.repository=airgap/mysql \
     --set image.tag=8
 ```
@@ -166,7 +165,7 @@ Will need to provide configuration to point to the new registry (instead of the 
 $ helm template mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
-    --set image.registry=harbor.h2o-2-1111.h2o.vmware.com \
+    --set image.registry=harbor.tanzu.home \
     --set image.repository=airgap/mysql \
     --set image.tag=8
 ```
