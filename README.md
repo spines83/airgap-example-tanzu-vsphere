@@ -3,13 +3,14 @@
     - [Download container as a tarball](#download-container-as-a-tarball)
     - [Download helm chart as a tarball](#download-helm-chart-as-a-tarball)
     - [Airgap the necessary resources](#airgap-the-necessary-resources)
-  - [Target network](#target-network)
+  - [Target network (prep)](#target-network-prep)
+    - [Login to your target contianer registry](#login-to-your-target-contianer-registry)
+    - [Login to the kubernetes cluster](#login-to-the-kubernetes-cluster)
+    - [Disable SSL verification from your local workstation to the container registry](#disable-ssl-verification-from-your-local-workstation-to-the-container-registry)
+    - [Deploy needed role-based access control (RBAC) resources](#deploy-needed-role-based-access-control-rbac-resources)
+  - [Target network (deploy)](#target-network-deploy)
     - [Load the docker contianer locally](#load-the-docker-contianer-locally)
-    - [(if needed) Login to your target contianer registry](#if-needed-login-to-your-target-contianer-registry)
-    - [(if needed) disable SSL verification from your local workstation to the container registry](#if-needed-disable-ssl-verification-from-your-local-workstation-to-the-container-registry)
     - [Re-tag and push the container to the destination network's container registry](#re-tag-and-push-the-container-to-the-destination-networks-container-registry)
-    - [(if needed) Login to your target kubernetes cluster](#if-needed-login-to-your-target-kubernetes-cluster)
-    - [(if needed) Deploy needed role-based access control (RBAC) resources](#if-needed-deploy-needed-role-based-access-control-rbac-resources)
   - [Deploy the helm package](#deploy-the-helm-package)
   - [Verify installation details](#verify-installation-details)
   - [Uninstalling](#uninstalling)
@@ -44,19 +45,24 @@ mysql_container.tgz
 mysql-9.3.1.tgz
 ```
 
-## Target network
+## Target network (prep)
 
-### Load the docker contianer locally
-```
-docker load -i mysql_container.tgz
-```
+Run the following if needed
 
-### (if needed) Login to your target contianer registry
+### Login to your target contianer registry
 ```
 docker login harbor.h2o-2-1111.h2o.vmware.com
 ```
 
-### (if needed) disable SSL verification from your local workstation to the container registry
+### Login to the kubernetes cluster
+```
+kubectl vsphere login \
+      --server=https://<worker-cluster-control-plane-endpoint>:6443 \
+      --insecure-skip-tls-verify \
+      --tanzu-kubernetes-cluster-name worker-cluster-name
+```
+
+### Disable SSL verification from your local workstation to the container registry
 ```
 $ cat ~/.docker/daemon.json
 {
@@ -78,23 +84,9 @@ $ cat ~/.docker/daemon.json
 
 If you are using Docker Desktop with windows, that file is located at `C:\Program Data\docker\config\daemon.json`
 
+Disclaimer: The secure way to do this is to grab the CA from your container registry, install it in a known path (OS dependent), and restart docker. 
 
-### Re-tag and push the container to the destination network's container registry
-```
-docker tag docker.io/mysql:8 harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
-docker push harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
-```
-
-### (if needed) Login to your target kubernetes cluster
-```
-kubectl vsphere login \
-      --server=https://<worker-cluster-control-plane-endpoint>:6443 \
-      --insecure-skip-tls-verify \
-      --tanzu-kubernetes-cluster-name worker-cluster-name
-```
-
-
-### (if needed) Deploy needed role-based access control (RBAC) resources
+### Deploy needed role-based access control (RBAC) resources
 
 This example below just deploys a global "anyone can run stuff privileged" policy. It should not be used on a production system. 
 
@@ -126,6 +118,19 @@ subjects:
   name: system:serviceaccounts
 
 $ kubectl apply -f default_privileged_sas.yaml
+```
+
+## Target network (deploy)
+
+### Load the docker contianer locally
+```
+docker load -i mysql_container.tgz
+```
+
+### Re-tag and push the container to the destination network's container registry
+```
+docker tag docker.io/mysql:8 harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
+docker push harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
 ```
 
 ## Deploy the helm package
