@@ -166,7 +166,7 @@ Will need to provide configuration to point to the new registry (instead of the 
 $ helm install mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
-    --set image.registry=harbor.h2o-2-1111.h2o.vmware.com \
+    --set image.registry=harbor.tanzu.home \
     --set primary.persistence.size=100Gi
 ```
 
