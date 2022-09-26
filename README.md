@@ -1,6 +1,19 @@
-# Using kubectl 
-
-
+- [Using kubectl + helm](#using-kubectl--helm)
+  - [Source network (public internet)](#source-network-public-internet)
+    - [Download container as a tarball](#download-container-as-a-tarball)
+    - [Download helm chart as a tarball](#download-helm-chart-as-a-tarball)
+    - [Airgap the necessary resources](#airgap-the-necessary-resources)
+  - [Target network](#target-network)
+    - [Load the docker contianer locally](#load-the-docker-contianer-locally)
+    - [(if needed) Login to your target contianer registry](#if-needed-login-to-your-target-contianer-registry)
+    - [(if needed) disable SSL verification from your local workstation to the container registry](#if-needed-disable-ssl-verification-from-your-local-workstation-to-the-container-registry)
+    - [Re-tag and push the container to the destination network's container registry](#re-tag-and-push-the-container-to-the-destination-networks-container-registry)
+    - [(if needed) Login to your target kubernetes cluster](#if-needed-login-to-your-target-kubernetes-cluster)
+    - [(if needed) Deploy needed role-based access control (RBAC) resources](#if-needed-deploy-needed-role-based-access-control-rbac-resources)
+  - [Deploy the helm package](#deploy-the-helm-package)
+  - [Verify installation details](#verify-installation-details)
+  - [Uninstalling](#uninstalling)
+- [Using kubectl](#using-kubectl)
 
 # Using kubectl + helm
 
@@ -156,3 +169,8 @@ Helm does not clean up persistent volumes by default. If you want to fully remov
 ```
 $ kubectl delete pvc data-mysql-0 -n mysql
 ```
+
+
+# Using kubectl 
+
+(wip)
