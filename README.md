@@ -32,14 +32,14 @@ If you're using vSphere w/ Tanzu, `kubectl` and `kubectl-vsphere` can be downloa
 
 ### Download container as a tarball
 ```
-$ docker pull docker.io/mysql:8
-$ docker save docker.io/mysql:8 -o mysql_container.tgz
+$ docker pull docker.io/bitnami/mysql:8.0.30-debian-11-r6
+$ docker save docker.io/bitnami/mysql:8.0.30-debian-11-r6 -o mysql_container.tgz
 ```
 
 ### Download helm chart as a tarball
 ```
 # This will create mysql-9.3.1.tgz
-$ helm pull bitnami/mysql
+$ helm pull bitnami/mysql --version 9.3.1
 ```
 
 ### Airgap the necessary resources
@@ -136,9 +136,11 @@ $ docker load -i mysql_container.tgz
 
 ### Re-tag and push the container to the destination network's container registry
 ```
-$ docker tag docker.io/mysql:8 harbor.tanzu.home/airgap/mysql:8
-$ docker push harbor.tanzu.home/airgap/mysql:8
+$ docker tag docker.io/bitnami/mysql:8.0.30-debian-11-r6 \
+             harbor.tanzu.home/bitnami/mysql:8.0.30-debian-11-r6
+$ docker push harbor.tanzu.home/bitnami/mysql:8.0.30-debian-11-r6
 ```
+If you get an error `unauthorized: project bitnami not found: project bitnami not found` you'll need to login to Harbor and create that project (make sure public is checked for the sake of this guide)
 
 ### (Optional) Preview kubernetes resources to be deployed
 
@@ -150,9 +152,7 @@ If you wanted to omit helm, you'd need to build & configure a good bit of this m
 $ helm template mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
-    --set image.registry=harbor.tanzu.home \
-    --set image.repository=airgap/mysql \
-    --set image.tag=8
+    --set image.registry=harbor.tanzu.home
 ```
 
 ### Deploy the helm package
@@ -162,12 +162,10 @@ Docs for the MySQL Helm chart: https://github.com/bitnami/charts/tree/master/bit
 Will need to provide configuration to point to the new registry (instead of the default public internet one)
 
 ```
-$ helm template mysql mysql-9.3.1.tgz \
+$ helm install mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
-    --set image.registry=harbor.tanzu.home \
-    --set image.repository=airgap/mysql \
-    --set image.tag=8
+    --set image.registry=harbor.tanzu.home
 ```
 
 ### Verify installation details
