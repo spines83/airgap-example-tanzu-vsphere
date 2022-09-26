@@ -33,14 +33,14 @@ If you're using vSphere w/ Tanzu, `kubectl` and `kubectl-vsphere` can be downloa
 ### Download container as a tarball
 ```
 # syntax docker save <image> -o <filename>
-docker pull docker.io/mysql:8
-docker save docker.io/mysql:8 -o mysql_container.tgz
+$ docker pull docker.io/mysql:8
+$ docker save docker.io/mysql:8 -o mysql_container.tgz
 ```
 
 ### Download helm chart as a tarball
 ```
 # This will create mysql-9.3.1.tgz
-helm pull bitnami/mysql
+$ helm pull bitnami/mysql
 ```
 
 ### Airgap the necessary resources
@@ -55,12 +55,12 @@ Run the following if needed
 
 ### Login to your target contianer registry
 ```
-docker login harbor.h2o-2-1111.h2o.vmware.com
+$ docker login harbor.h2o-2-1111.h2o.vmware.com
 ```
 
 ### Login to the kubernetes cluster
 ```
-kubectl vsphere login \
+$ kubectl vsphere login \
       --server=https://<worker-cluster-control-plane-endpoint>:6443 \
       --insecure-skip-tls-verify \
       --tanzu-kubernetes-cluster-name worker-cluster-name
@@ -132,13 +132,13 @@ $ kubectl apply -f default_privileged_sas.yaml
 
 ### Load the docker contianer locally
 ```
-docker load -i mysql_container.tgz
+$ docker load -i mysql_container.tgz
 ```
 
 ### Re-tag and push the container to the destination network's container registry
 ```
-docker tag docker.io/mysql:8 harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
-docker push harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
+$ docker tag docker.io/mysql:8 harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
+$ docker push harbor.h2o-2-1111.h2o.vmware.com/airgap/mysql:8
 ```
 
 ### (Optional) Preview kubernetes resources to be deployed
@@ -148,7 +148,7 @@ This is definitely good to run and look at for educational purposes. When you ru
 If you wanted to omit helm, you'd need to build & configure a good bit of this manually. Bitnami does a pretty good job throwing togther "production-ready" helm charts. 
 
 ```
-helm template mysql mysql-9.3.1.tgz \
+$ helm template mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
     --set image.registry=harbor.h2o-2-1111.h2o.vmware.com \
@@ -163,7 +163,7 @@ Docs for the MySQL Helm chart: https://github.com/bitnami/charts/tree/master/bit
 Will need to provide configuration to point to the new registry (instead of the default public internet one)
 
 ```
-helm template mysql mysql-9.3.1.tgz \
+$ helm template mysql mysql-9.3.1.tgz \
     --namespace mysql \
     --create-namespace \
     --set image.registry=harbor.h2o-2-1111.h2o.vmware.com \
